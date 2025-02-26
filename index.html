@@ -1,746 +1,132 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Penjana Surat Sekolah</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #1e88e5;
-            --secondary-color: #f5f5f5;
-            --accent-color: #ffc107;
-            --text-color: #333;
-            --light-text: #666;
-            --border-color: #ddd;
-            --success-color: #4caf50;
-            --error-color: #f44336;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: #f9f9f9;
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 20px 0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        
-        header .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-        }
-        
-        .logo i {
-            margin-right: 10px;
-        }
-        
-        main {
-            padding: 40px 0;
-        }
-        
-        .card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-        
-        h1, h2, h3 {
-            margin-bottom: 15px;
-            color: var(--primary-color);
-        }
-        
-        h1 {
-            font-size: 32px;
-        }
-        
-        h2 {
-            font-size: 24px;
-        }
-        
-        h3 {
-            font-size: 20px;
-        }
-        
-        p {
-            margin-bottom: 15px;
-        }
-        
-        .form-section {
-            margin-bottom: 30px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        
-        input, textarea, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        input:focus, textarea:focus, select:focus {
-            border-color: var(--primary-color);
-            outline: none;
-        }
-        
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-        
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 12px 24px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        button i {
-            margin-right: 8px;
-        }
-        
-        button:hover {
-            background-color: #1976d2;
-        }
-        
-        button.secondary {
-            background-color: var(--light-text);
-        }
-        
-        button.secondary:hover {
-            background-color: #555;
-        }
-        
-        .button-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .letter-selector {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .letter-option {
-            background-color: var(--secondary-color);
-            border: 2px solid var(--border-color);
-            border-radius: 6px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .letter-option:hover {
-            border-color: var(--primary-color);
-            transform: translateY(-3px);
-        }
-        
-        .letter-option.selected {
-            border-color: var(--primary-color);
-            background-color: rgba(30, 136, 229, 0.1);
-        }
-        
-        .letter-option h3 {
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-        
-        .letter-option p {
-            font-size: 14px;
-            color: var(--light-text);
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .step {
-            display: none;
-        }
-        
-        .step.active {
-            display: block;
-        }
-        
-        .progress-bar {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 40px;
-            position: relative;
-        }
-        
-        .progress-bar::before {
-            content: '';
-            position: absolute;
-            top: 15px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background-color: var(--border-color);
-            z-index: 1;
-        }
-        
-        .progress-step {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .step-number {
-            width: 30px;
-            height: 30px;
-            background-color: white;
-            border: 2px solid var(--border-color);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 8px;
-            font-weight: bold;
-            background-color: var(--secondary-color);
-        }
-        
-        .step-text {
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .progress-step.active .step-number {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-            color: white;
-        }
-        
-        .progress-step.completed .step-number {
-            background-color: var(--success-color);
-            border-color: var(--success-color);
-            color: white;
-        }
-        
-        #letter-preview {
-            padding: 30px;
-            background-color: white;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            margin-bottom: 30px;
-            font-family: 'Times New Roman', Times, serif;
-            line-height: 1.8;
-        }
-        
-        .preview-header {
-            text-align: right;
-            margin-bottom: 30px;
-        }
-        
-        .preview-header p {
-            margin-bottom: 5px;
-        }
-        
-        .preview-content {
-            margin-bottom: 30px;
-        }
-        
-        .preview-footer {
-            text-align: right;
-        }
-        
-        .alert {
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }
-        
-        .alert-success {
-            background-color: rgba(76, 175, 80, 0.1);
-            border: 1px solid var(--success-color);
-            color: var(--success-color);
-        }
-        
-        .alert-error {
-            background-color: rgba(244, 67, 54, 0.1);
-            border: 1px solid var(--error-color);
-            color: var(--error-color);
-        }
-        
-        footer {
-            background-color: var(--secondary-color);
-            padding: 20px 0;
-            border-top: 1px solid var(--border-color);
-            text-align: center;
-            color: var(--light-text);
-            font-size: 14px;
-        }
-        
-        @media screen and (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            
-            .card {
-                padding: 20px;
-            }
-            
-            h1 {
-                font-size: 24px;
-            }
-            
-            h2 {
-                font-size: 20px;
-            }
-            
-            .letter-selector {
-                grid-template-columns: 1fr;
-            }
-            
-            .button-group {
-                flex-direction: column;
-            }
-            
-            button {
-                width: 100%;
-            }
-            
-            .step-text {
-                font-size: 12px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Penjana Surat Sekolah</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 12px;
+      color: #555;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="logo">
-                <i class="fas fa-file-alt"></i>
-                <span>Penjana Surat Sekolah</span>
-            </div>
-        </div>
-    </header>
-    
-    <main>
-        <div class="container">
-            <div class="card">
-                <div class="progress-bar">
-                    <div class="progress-step active" data-step="1">
-                        <div class="step-number">1</div>
-                        <div class="step-text">Pilih Jenis Surat</div>
-                    </div>
-                    <div class="progress-step" data-step="2">
-                        <div class="step-number">2</div>
-                        <div class="step-text">Isi Maklumat</div>
-                    </div>
-                    <div class="progress-step" data-step="3">
-                        <div class="step-number">3</div>
-                        <div class="step-text">Semak & Jana PDF</div>
-                    </div>
-                </div>
-                
-                <div class="step active" id="step-1">
-                    <h2>Pilih Jenis Surat</h2>
-                    <p>Sila pilih jenis surat yang ingin dijana:</p>
-                    
-                    <div class="letter-selector">
-                        <div class="letter-option" data-letter-type="cuti">
-                            <h3>Surat Permohonan Cuti Sekolah</h3>
-                            <p>Untuk memohon cuti atau kebenaran tidak hadir ke sekolah untuk tempoh tertentu.</p>
-                        </div>
-                        
-                        <div class="letter-option" data-letter-type="tidak-hadir">
-                            <h3>Surat Tidak Hadir ke Sekolah</h3>
-                            <p>Untuk memaklumkan ketidakhadiran anak ke sekolah pada tarikh tertentu.</p>
-                        </div>
-                        
-                        <div class="letter-option" data-letter-type="rayuan">
-                            <h3>Surat Rayuan Kemasukan Sekolah</h3>
-                            <p>Untuk merayu kemasukan anak ke sekolah pilihan.</p>
-                        </div>
-                        
-                        <div class="letter-option" data-letter-type="biasiswa">
-                            <h3>Surat Rayuan Biasiswa/Penangguhan Yuran</h3>
-                            <p>Untuk memohon biasiswa atau penangguhan pembayaran yuran sekolah.</p>
-                        </div>
-                        
-                        <div class="letter-option" data-letter-type="pendapatan">
-                            <h3>Surat Akuan Pendapatan Ibubapa/Penjaga</h3>
-                            <p>Untuk mengesahkan pendapatan ibu bapa atau penjaga.</p>
-                        </div>
-                        
-                        <div class="letter-option" data-letter-type="mata-pelajaran">
-                            <h3>Surat Permohonan Perubahan Mata Pelajaran</h3>
-                            <p>Untuk memohon perubahan mata pelajaran yang diambil oleh anak.</p>
-                        </div>
-                        
-                        <div class="letter-option" data-letter-type="aduan">
-                            <h3>Surat Aduan Masalah di Sekolah</h3>
-                            <p>Untuk membuat aduan berkaitan masalah yang dihadapi di sekolah.</p>
-                        </div>
-                        
-                        <div class="letter-option" data-letter-type="program">
-                            <h3>Surat Kebenaran Mengikuti Program Sekolah</h3>
-                            <p>Untuk memberi kebenaran anak mengikuti program anjuran sekolah.</p>
-                        </div>
-                        
-                        <div class="letter-option" data-letter-type="kenderaan">
-                            <h3>Surat Kebenaran Menggunakan Kenderaan Sendiri ke Sekolah</h3>
-                            <p>Untuk memohon kebenaran anak menggunakan kenderaan sendiri ke sekolah.</p>
-                        </div>
-                        
-                        <div class="letter-option" data-letter-type="sijil">
-                            <h3>Surat Permohonan Salinan Sijil Berhenti Sekolah</h3>
-                            <p>Untuk memohon salinan sijil berhenti sekolah.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="button-group">
-                        <button id="next-step-1" disabled>
-                            <i class="fas fa-arrow-right"></i> Teruskan
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="step" id="step-2">
-                    <h2 id="form-title">Isi Maklumat</h2>
-                    
-                    <!-- Form untuk Surat Permohonan Cuti Sekolah -->
-                    <div class="letter-form hidden" id="cuti-form">
-                        <div class="form-group">
-                            <label for="cuti-nama-pelajar">Nama Pelajar:</label>
-                            <input type="text" id="cuti-nama-pelajar" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="cuti-kelas">Kelas:</label>
-                            <input type="text" id="cuti-kelas" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="cuti-tarikh-mula">Tarikh Mula Cuti:</label>
-                            <input type="date" id="cuti-tarikh-mula" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="cuti-tarikh-akhir">Tarikh Akhir Cuti:</label>
-                            <input type="date" id="cuti-tarikh-akhir" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="cuti-sebab">Sebab Cuti:</label>
-                            <textarea id="cuti-sebab" required></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="cuti-nama-ibubapa">Nama Ibu/Bapa/Penjaga:</label>
-                            <input type="text" id="cuti-nama-ibubapa" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="cuti-no-tel">No. Telefon:</label>
-                            <input type="text" id="cuti-no-tel" required>
-                        </div>
-                    </div>
-                    
-                    <!-- Form untuk Surat Tidak Hadir ke Sekolah -->
-                    <div class="letter-form hidden" id="tidak-hadir-form">
-                        <div class="form-group">
-                            <label for="tidak-hadir-nama-pelajar">Nama Pelajar:</label>
-                            <input type="text" id="tidak-hadir-nama-pelajar" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="tidak-hadir-kelas">Kelas:</label>
-                            <input type="text" id="tidak-hadir-kelas" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="tidak-hadir-tarikh">Tarikh Tidak Hadir:</label>
-                            <input type="date" id="tidak-hadir-tarikh" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="tidak-hadir-sebab">Sebab Tidak Hadir:</label>
-                            <textarea id="tidak-hadir-sebab" required></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="tidak-hadir-nama-ibubapa">Nama Ibu/Bapa/Penjaga:</label>
-                            <input type="text" id="tidak-hadir-nama-ibubapa" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="tidak-hadir-no-tel">No. Telefon:</label>
-                            <input type="text" id="tidak-hadir-no-tel" required>
-                        </div>
-                    </div>
-                    
-                    <!-- Form untuk Surat Rayuan Kemasukan Sekolah -->
-                    <div class="letter-form hidden" id="rayuan-form">
-                        <div class="form-group">
-                            <label for="rayuan-nama-pelajar">Nama Pelajar:</label>
-                            <input type="text" id="rayuan-nama-pelajar" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="rayuan-no-ic">No. Kad Pengenalan:</label>
-                            <input type="text" id="rayuan-no-ic" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="rayuan-sekolah-semasa">Sekolah Semasa (jika ada):</label>
-                            <input type="text" id="rayuan-sekolah-semasa">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="rayuan-sekolah-pilihan">Sekolah Pilihan:</label>
-                            <input type="text" id="rayuan-sekolah-pilihan" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="rayuan-alasan">Alasan Rayuan:</label>
-                            <textarea id="rayuan-alasan" required></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="rayuan-nama-ibubapa">Nama Ibu/Bapa/Penjaga:</label>
-                            <input type="text" id="rayuan-nama-ibubapa" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="rayuan-no-tel">No. Telefon:</label>
-                            <input type="text" id="rayuan-no-tel" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="rayuan-alamat">Alamat:</label>
-                            <textarea id="rayuan-alamat" required></textarea>
-                        </div>
-                    </div>
-                    
-                    <!-- Form untuk Surat Rayuan Biasiswa/Penangguhan Yuran -->
-                    <div class="letter-form hidden" id="biasiswa-form">
-                        <div class="form-group">
-                            <label for="biasiswa-nama-pelajar">Nama Pelajar:</label>
-                            <input type="text" id="biasiswa-nama-pelajar" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="biasiswa-kelas">Kelas:</label>
-                            <input type="text" id="biasiswa-kelas" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="biasiswa-jenis">Jenis Permohonan:</label>
-                            <select id="biasiswa-jenis" required>
-                                <option value="">-- Pilih --</option>
-                                <option value="Biasiswa">Biasiswa</option>
-                                <option value="Penangguhan Yuran">Penangguhan Yuran</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="biasiswa-alasan">Alasan Permohonan:</label>
-                            <textarea id="biasiswa-alasan" required></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="biasiswa-pendapatan">Jumlah Pendapatan Bulanan Keluarga (RM):</label>
-                            <input type="number" id="biasiswa-pendapatan" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="biasiswa-nama-ibubapa">Nama Ibu/Bapa/Penjaga:</label>
-                            <input type="text" id="biasiswa-nama-ibubapa" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="biasiswa-no-tel">No. Telefon:</label>
-                            <input type="text" id="biasiswa-no-tel" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="biasiswa-alamat">Alamat:</label>
-                            <textarea id="biasiswa-alamat" required></textarea>
-                        </div>
-                    </div>
-                    
-                    <!-- Form untuk Surat Akuan Pendapatan Ibubapa/Penjaga -->
-                    <div class="letter-form hidden" id="pendapatan-form">
-                        <div class="form-group">
-                            <label for="pendapatan-nama-ibubapa">Nama Ibu/Bapa/Penjaga:</label>
-                            <input type="text" id="pendapatan-nama-ibubapa" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="pendapatan-no-ic">No. Kad Pengenalan:</label>
-                            <input type="text" id="pendapatan-no-ic" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="pendapatan-pekerjaan">Pekerjaan:</label>
-                            <input type="text" id="pendapatan-pekerjaan" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="pendapatan-bulanan">Pendapatan Bulanan (RM):</label>
-                            <input type="number" id="pendapatan-bulanan" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="pendapatan-nama-pelajar">Nama Pelajar:</label>
-                            <input type="text" id="pendapatan-nama-pelajar" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="pendapatan-kelas">Kelas:</label>
-                            <input type="text" id="pendapatan-kelas" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="pendapatan-tujuan">Tujuan Akuan:</label>
-                            <textarea id="pendapatan-tujuan" required></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="pendapatan-no-tel">No. Telefon:</label>
-                            <input type="text" id="pendapatan-no-tel" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="pendapatan-alamat">Alamat:</label>
-                            <textarea id="pendapatan-alamat" required></textarea>
-                        </div>
-                    </div>
-                    
-                    <!-- Form untuk Surat Permohonan Perubahan Mata Pelajaran -->
-                    <div class="letter-form hidden" id="mata-pelajaran-form">
-                        <div class="form-group">
-                            <label for="mata-pelajaran-nama-pelajar">Nama Pelajar:</label>
-                            <input type="text" id="mata-pelajaran-nama-pelajar" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="mata-pelajaran-kelas">Kelas:</label>
-                            <input type="text" id="mata-pelajaran-kelas" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="mata-pelajaran-semasa">Mata Pelajaran Semasa:</label>
-                            <input type="text" id="mata-pelajaran-semasa" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="mata-pelajaran-baru">Mata Pelajaran Baru:</label>
-                            <input type="text" id="mata-pelajaran-baru" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="mata-pelajaran-alasan">Alasan Perubahan:</label>
-                            <textarea id="mata-pelajaran-alasan" required></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="mata-pelajaran-nama-ibubapa">Nama Ibu/Bapa/Penjaga:</label>
-                            <input type="text" id="mata-pelajaran-nama-ibubapa" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="mata-pelajaran-no-tel">No. Telefon:</label>
-                            <input type="text" id="mata-pelajaran-no-tel" required>
-                        </div>
-                    </div>
-                    
-                    <!-- Form untuk Surat Aduan Masalah di Sekolah -->
-                    <div class="letter-form hidden" id="aduan-form">
-                        <div class="form-group">
-                            <label for="aduan-nama-ibubapa">Nama Ibu/Bapa/Penjaga:</label>
-                            <input type="text" id="aduan-nama-ibubapa" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="aduan-nama-pelajar">Nama Pelajar:</label>
-                            <input type="text" id="aduan-nama-pelajar" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="aduan-kelas">Kelas:</label>
-                            <input type="text" id="aduan-kelas" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="aduan-jenis">Jenis Aduan:</label>
-                            <select id="aduan-jenis" required>
-                                <option value="">-- Pilih --</option>
-                                <option value="Buli">Buli</option>
-                                <option value="Prasarana Sekolah">Prasarana Sekolah</option>
-                                <option value="Pengajaran Guru">Pengajaran Guru</option>
-                                <option value="Disiplin">Disiplin</option>
-                                <option value="Lain-lain">Lain-lain</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group hidden" id="aduan-jenis-lain-group">
-                            <label for="aduan-jenis-lain">Nyatakan Jenis Aduan:</label>
-                            <input type="text" id="aduan-jenis-lain">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="aduan-tarikh">Tarikh Kejadian:</label>
-                            <input type="date" id="aduan-tarikh" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="aduan-perincian">Perincian Aduan:</label>
-                            <textarea id="aduan-perincian" required></textarea>
-                        </div>
-                        
-                        <div class="form-group">
+  <div class="container">
+    <h1>Penjana Surat Sekolah</h1>
+    <form id="letterForm">
+      <label for="letterType">Jenis Surat:</label>
+      <select id="letterType" name="letterType" required>
+        <option value="">Pilih Jenis Surat</option>
+        <option value="cuti_rehat">Surat Permohonan Cuti Rehat</option>
+        <option value="cuti_tanpa_rekod">Surat Permohonan Cuti Tanpa Rekod</option>
+        <option value="pertukaran_sekolah">Surat Permohonan Pertukaran Sekolah</option>
+        <option value="aduan_disiplin">Surat Aduan Disiplin Pelajar</option>
+        <option value="peralatan_mengajar">Surat Permohonan Peralatan Mengajar</option>
+        <option value="perakuan_guru">Surat Perakuan Guru Kelas</option>
+        <option value="jemputan_penceramah">Surat Jemputan Penceramah</option>
+        <option value="program_sekolah">Surat Permohonan Program Sekolah</option>
+        <option value="sokongan_pelajar">Surat Sokongan untuk Pelajar Sekolah</option>
+        <option value="laporan_prestasi">Surat Laporan Prestasi Pelajar</option>
+      </select>
+
+      <label for="nama">Nama:</label>
+      <input type="text" id="nama" name="nama" required>
+
+      <label for="tarikh">Tarikh:</label>
+      <input type="date" id="tarikh" name="tarikh" required>
+
+      <label for="keterangan">Keterangan:</label>
+      <textarea id="keterangan" name="keterangan" rows="5" required></textarea>
+
+      <button type="button" onclick="generatePDF()">Jana PDF</button>
+    </form>
+    <div class="footer">
+      Mr. Syah @ 2025 Hak Cipta Terpelihara
+    </div>
+  </div>
+
+  <script>
+    const { jsPDF } = window.jspdf;
+
+    function generatePDF() {
+      const letterType = document.getElementById('letterType').value;
+      const nama = document.getElementById('nama').value;
+      const tarikh = document.getElementById('tarikh').value;
+      const keterangan = document.getElementById('keterangan').value;
+
+      const doc = new jsPDF();
+
+      // Header
+      doc.setFontSize(18);
+      doc.text(`Surat ${getLetterTitle(letterType)}`, 10, 15);
+
+      // Content
+      doc.setFontSize(12);
+      doc.text(`Nama: ${nama}`, 10, 30);
+      doc.text(`Tarikh: ${tarikh}`, 10, 40);
+      doc.text(`Keterangan:`, 10, 50);
+      doc.text(keterangan, 10, 60);
+
+      // Footer
+      doc.setFontSize(10);
+      doc.text("Mr. Syah @ 2025 Hak Cipta Terpelihara", 10, 280);
+
+      doc.save(`Surat_${getLetterTitle(letterType)}.pdf`);
+    }
+
+    function getLetterTitle(letterType) {
+      switch (letterType) {
+        case 'cuti_rehat': return 'Permohonan Cuti Rehat';
+        case 'cuti_tanpa_rekod': return 'Permohonan Cuti Tanpa Rekod';
+        case 'pertukaran_sekolah': return 'Permohonan Pertukaran Sekolah';
+        case 'aduan_disiplin': return 'Aduan Disiplin Pelajar';
+        case 'peralatan_mengajar': return 'Permohonan Peralatan Mengajar';
+        case 'perakuan_guru': return 'Perakuan Guru Kelas';
+        case 'jemputan_penceramah': return 'Jemputan Penceramah';
+        case 'program_sekolah': return 'Permohonan Program Sekolah';
+        case 'sokongan_pelajar': return 'Sokongan untuk Pelajar Sekolah';
+        case 'laporan_prestasi': return 'Laporan Prestasi Pelajar';
+        default: return '';
+      }
+    }
+  </script>
+</body>
+</html>
