@@ -1,132 +1,825 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Penjana Surat Sekolah</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-    h1 {
-      text-align: center;
-    }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    input, textarea, select {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    button {
-      padding: 10px 20px;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #218838;
-    }
-    .footer {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 12px;
-      color: #555;
-    }
-  </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学校信函生成系统</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #e8f4fc;
+            --accent-color: #2980b9;
+            --text-color: #2c3e50;
+            --light-bg: #f9f9f9;
+            --border-color: #ddd;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 25px 0;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        
+        header p {
+            font-size: 16px;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        
+        .form-section {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .preview-section {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+        
+        h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+            font-size: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        select, input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 5px;
+            transition: all 0.3s;
+            background-color: #fff;
+        }
+        
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.2);
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-right: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        button svg {
+            margin-right: 8px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .preview-content {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            min-height: 500px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .preview-letter {
+            background-color: white;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            min-height: 100%;
+            position: relative;
+        }
+        
+        .letter-content {
+            margin-top: 40px;
+        }
+        
+        .letter-content p {
+            margin-bottom: 25px;
+            line-height: 1.8;
+        }
+        
+        .letter-header {
+            margin-bottom: 60px;
+        }
+        
+        .letter-footer {
+            margin-top: 60px;
+            text-align: right;
+            font-style: italic;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        
+        .instructions {
+            background-color: var(--secondary-color);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .instructions h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid var(--warning-color);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .editable {
+            border: 1px dashed transparent;
+            padding: 5px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .editable:hover {
+            border-color: var(--accent-color);
+            background-color: rgba(41, 128, 185, 0.05);
+        }
+        
+        .editable:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            background-color: rgba(41, 128, 185, 0.1);
+        }
+        
+        .edit-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            opacity: 0.8;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .edit-icon {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+        }
+        
+        .form-tips {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .lettertype-container {
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: var(--light-bg);
+        }
+        
+        .lettertype-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .lettertype-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .lettertype-item {
+            padding: 10px;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .lettertype-item:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .lettertype-item.active {
+            background-color: var(--secondary-color);
+            border-color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .lettertype-item.active::before {
+            content: "✓ ";
+            color: var(--success-color);
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0.6;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .preview-section, .form-section {
+                width: 100%;
+            }
+            
+            .lettertype-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Penjana Surat Sekolah</h1>
-    <form id="letterForm">
-      <label for="letterType">Jenis Surat:</label>
-      <select id="letterType" name="letterType" required>
-        <option value="">Pilih Jenis Surat</option>
-        <option value="cuti_rehat">Surat Permohonan Cuti Rehat</option>
-        <option value="cuti_tanpa_rekod">Surat Permohonan Cuti Tanpa Rekod</option>
-        <option value="pertukaran_sekolah">Surat Permohonan Pertukaran Sekolah</option>
-        <option value="aduan_disiplin">Surat Aduan Disiplin Pelajar</option>
-        <option value="peralatan_mengajar">Surat Permohonan Peralatan Mengajar</option>
-        <option value="perakuan_guru">Surat Perakuan Guru Kelas</option>
-        <option value="jemputan_penceramah">Surat Jemputan Penceramah</option>
-        <option value="program_sekolah">Surat Permohonan Program Sekolah</option>
-        <option value="sokongan_pelajar">Surat Sokongan untuk Pelajar Sekolah</option>
-        <option value="laporan_prestasi">Surat Laporan Prestasi Pelajar</option>
-      </select>
-
-      <label for="nama">Nama:</label>
-      <input type="text" id="nama" name="nama" required>
-
-      <label for="tarikh">Tarikh:</label>
-      <input type="date" id="tarikh" name="tarikh" required>
-
-      <label for="keterangan">Keterangan:</label>
-      <textarea id="keterangan" name="keterangan" rows="5" required></textarea>
-
-      <button type="button" onclick="generatePDF()">Jana PDF</button>
-    </form>
-    <div class="footer">
-      Mr. Syah @ 2025 Hak Cipta Terpelihara
+    <div class="container">
+        <header>
+            <h1>Sistem Penjana Surat Sekolah</h1>
+            <p>Janakan surat untuk urusan sekolah dengan mudah, cepat dan profesional</p>
+        </header>
+        
+        <div class="instructions">
+            <h3>Panduan Penggunaan</h3>
+            <ol>
+                <li>Pilih jenis surat yang ingin dihasilkan dari senarai yang disediakan</li>
+                <li>Isikan maklumat yang diperlukan dalam borang yang disediakan</li>
+                <li>Klik butang "Lihat Pratonton" untuk melihat surat yang dihasilkan</li>
+                <li>Anda boleh <strong>mengedit teks</strong> secara terus pada pratonton dengan mengklik pada bahagian teks yang ingin diedit</li>
+                <li>Pastikan semua maklumat yang diperlukan telah diisi dengan betul</li>
+                <li>Klik butang "Jana PDF" untuk memuat turun surat dalam format PDF</li>
+            </ol>
+            <div class="note">
+                <strong>Nota Penting:</strong> Semua teks pada pratonton boleh diedit dengan klik pada teks tersebut sebelum menjana PDF. Ini membolehkan anda menyesuaikan kandungan surat mengikut keperluan.
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="form-section">
+                <h2>Maklumat Surat</h2>
+                
+                <div class="lettertype-container">
+                    <div class="lettertype-title">Jenis Surat</div>
+                    <div class="lettertype-grid" id="letterTypeGrid">
+                        <div class="lettertype-item" data-value="cuti">Surat Permohonan Cuti Sekolah</div>
+                        <div class="lettertype-item" data-value="tidakHadir">Surat Tidak Hadir ke Sekolah</div>
+                        <div class="lettertype-item" data-value="rayuanKemasukan">Surat Rayuan Kemasukan Sekolah</div>
+                        <div class="lettertype-item" data-value="rayuanBiasiswa">Surat Rayuan Biasiswa/Penangguhan Yuran</div>
+                        <div class="lettertype-item" data-value="akuanPendapatan">Surat Akuan Pendapatan Ibubapa/Penjaga</div>
+                        <div class="lettertype-item" data-value="perubahanSubjek">Surat Permohonan Perubahan Mata Pelajaran</div>
+                        <div class="lettertype-item" data-value="aduan">Surat Aduan Masalah di Sekolah</div>
+                        <div class="lettertype-item" data-value="kebenaranProgram">Surat Kebenaran Mengikuti Program Sekolah</div>
+                        <div class="lettertype-item" data-value="kebenaranKenderaan">Surat Kebenaran Menggunakan Kenderaan Sendiri</div>
+                        <div class="lettertype-item" data-value="salinanSijil">Surat Permohonan Salinan Sijil Berhenti Sekolah</div>
+                    </div>
+                    <input type="hidden" id="letterType" value="">
+                </div>
+                
+                <div class="form-group">
+                    <label for="senderName">Nama Penghantar</label>
+                    <input type="text" id="senderName" placeholder="Nama penuh penghantar">
+                    <div class="form-tips">Masukkan nama penuh anda sebagai penghantar surat</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="senderAddress">Alamat Penghantar</label>
+                    <textarea id="senderAddress" rows="3" placeholder="Alamat lengkap penghantar"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="senderPhone">No. Telefon</label>
+                    <input type="text" id="senderPhone" placeholder="Nombor telefon penghantar">
+                </div>
+                
+                <div class="form-group">
+                    <label for="letterDate">Tarikh Surat</label>
+                    <input type="date" id="letterDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="recipientName">Nama Penerima</label>
+                    <input type="text" id="recipientName" placeholder="Nama penerima/jabatan">
+                    <div class="form-tips">Contoh: Pengetua, Guru Besar, dll.</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="recipientPosition">Jawatan Penerima</label>
+                    <input type="text" id="recipientPosition" placeholder="Jawatan penerima">
+                </div>
+                
+                <div class="form-group">
+                    <label for="recipientInstitution">Institusi/Sekolah</label>
+                    <input type="text" id="recipientInstitution" placeholder="Nama sekolah/institusi">
+                </div>
+                
+                <div class="form-group">
+                    <label for="recipientAddress">Alamat Penerima</label>
+                    <textarea id="recipientAddress" rows="3" placeholder="Alamat lengkap penerima/institusi"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="studentName">Nama Pelajar (jika berkaitan)</label>
+                    <input type="text" id="studentName" placeholder="Nama pelajar jika berbeza daripada penghantar">
+                </div>
+                
+                <div class="form-group">
+                    <label for="studentClass">Kelas/Tingkatan (jika berkaitan)</label>
+                    <input type="text" id="studentClass" placeholder="Kelas atau tingkatan pelajar">
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="previewBtn" onclick="generatePreview()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                            <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                        </svg>
+                        Lihat Pratonton
+                    </button>
+                    <button id="resetBtn" onclick="resetForm()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                        </svg>
+                        Reset
+                    </button>
+                </div>
+            </div>
+            
+            <div class="preview-section">
+                <h2>Pratonton Surat</h2>
+                <div class="edit-indicator">
+                    <svg class="edit-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                    </svg>
+                    Klik pada teks untuk mengedit
+                </div>
+                <div class="preview-content">
+                    <div class="preview-letter" id="letterPreview">
+                        <div class="letter-header">
+                            <div contenteditable="true" class="editable" id="senderInfoPreview"></div>
+                            <div contenteditable="true" class="editable" id="datePreview"></div>
+                            <div contenteditable="true" class="editable" id="recipientInfoPreview"></div>
+                        </div>
+                        
+                        <div contenteditable="true" class="editable" id="letterSubjectPreview"></div>
+                        
+                        <div class="letter-content">
+                            <p contenteditable="true" class="editable" id="paragraph1"></p>
+                            <p contenteditable="true" class="editable" id="paragraph2"></p>
+                            <p contenteditable="true" class="editable" id="paragraph3"></p>
+                        </div>
+                        
+                        <div class="letter-footer">
+                            <div contenteditable="true" class="editable" id="closingPreview"></div>
+                            <div contenteditable="true" class="editable" id="senderNamePreview"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="generatePdfBtn" onclick="generatePDF()" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                            <path d="M4.603 14.087a.81.81 0 0 1-.438-.42c-.195-.388-.13-.776.08-1.102.198-.307.526-.568.897-.787a7.68 7.68 0 0 1 1.482-.645 19.697 19.697 0 0 0 1.062-2.227 7.269 7.269 0 0 1-.43-1.295c-.086-.4-.119-.796-.046-1.136.075-.354.274-.672.65-.823.192-.077.4-.12.602-.077a.7.7 0 0 1 .477.365c.088.164.12.356.127.538.007.188-.012.396-.047.614-.084.51-.27 1.134-.52 1.794a10.954 10.954 0 0 0 .98 1.686 5.753 5.753 0 0 1 1.334.05c.364.066.734.195.96.465.12.144.193.32.2.518.007.192-.047.382-.138.563a1.04 1.04 0 0 1-.354.416.856.856 0 0 1-.51.138c-.331-.014-.654-.196-.933-.417a5.712 5.712 0 0 1-.911-.95 11.651 11.651 0 0 0-1.997.406 11.307 11.307 0 0 1-1.02 1.51c-.292.35-.609.656-.927.787a.793.793 0 0 1-.58.029zm1.379-1.901c-.166.076-.32.15-.466.22-.148.072-.283.15-.416.23.239-.035.468-.084.705-.148.197-.266.373-.534.526-.809zm2.03-.635c.28-.15.537-.278.816-.417.145-.197.291-.396.42-.597a6.722 6.722 0 0 0-.653-.305 8.688 8.688 0 0 0-.582-.188zm-1.854-3.312c-.087.239-.18.469-.27.691.104.049.213.09.322.13.112.037.212.068.32.093.206-.629.375-1.197.518-1.648.082-.541.085-.962.037-1.307.002.172-.028.39-.057.642-.04.329-.1.655-.184.992z"/>
+                        </svg>
+                        Jana PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            Mr.Syah @ 2025 Hak Cipta Terpelihara
+        </footer>
     </div>
-  </div>
-
-  <script>
-    const { jsPDF } = window.jspdf;
-
-    function generatePDF() {
-      const letterType = document.getElementById('letterType').value;
-      const nama = document.getElementById('nama').value;
-      const tarikh = document.getElementById('tarikh').value;
-      const keterangan = document.getElementById('keterangan').value;
-
-      const doc = new jsPDF();
-
-      // Header
-      doc.setFontSize(18);
-      doc.text(`Surat ${getLetterTitle(letterType)}`, 10, 15);
-
-      // Content
-      doc.setFontSize(12);
-      doc.text(`Nama: ${nama}`, 10, 30);
-      doc.text(`Tarikh: ${tarikh}`, 10, 40);
-      doc.text(`Keterangan:`, 10, 50);
-      doc.text(keterangan, 10, 60);
-
-      // Footer
-      doc.setFontSize(10);
-      doc.text("Mr. Syah @ 2025 Hak Cipta Terpelihara", 10, 280);
-
-      doc.save(`Surat_${getLetterTitle(letterType)}.pdf`);
-    }
-
-    function getLetterTitle(letterType) {
-      switch (letterType) {
-        case 'cuti_rehat': return 'Permohonan Cuti Rehat';
-        case 'cuti_tanpa_rekod': return 'Permohonan Cuti Tanpa Rekod';
-        case 'pertukaran_sekolah': return 'Permohonan Pertukaran Sekolah';
-        case 'aduan_disiplin': return 'Aduan Disiplin Pelajar';
-        case 'peralatan_mengajar': return 'Permohonan Peralatan Mengajar';
-        case 'perakuan_guru': return 'Perakuan Guru Kelas';
-        case 'jemputan_penceramah': return 'Jemputan Penceramah';
-        case 'program_sekolah': return 'Permohonan Program Sekolah';
-        case 'sokongan_pelajar': return 'Sokongan untuk Pelajar Sekolah';
-        case 'laporan_prestasi': return 'Laporan Prestasi Pelajar';
-        default: return '';
-      }
-    }
-  </script>
+    
+    <script>
+        // Lettertype selection
+        const letterTypeItems = document.querySelectorAll('.lettertype-item');
+        const letterTypeInput = document.getElementById('letterType');
+        
+        letterTypeItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove active class from all items
+                letterTypeItems.forEach(i => i.classList.remove('active'));
+                
+                // Add active class to clicked item
+                this.classList.add('active');
+                
+                // Set the value in the hidden input
+                letterTypeInput.value = this.dataset.value;
+            });
+        });
+        
+        // Format date in DD/MM/YYYY
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '.');
+        }
+        
+        // Get letter content based on letter type
+        function getLetterContent(letterType) {
+            const contents = {
+                cuti: {
+                    subject: "PERMOHONAN CUTI SEKOLAH",
+                    paragraph1: "Dengan segala hormatnya, saya merujuk kepada perkara di atas. Saya ingin memohon cuti dari tarikh [TARIKH MULA] hingga [TARIKH AKHIR] bagi anak saya kerana [SEBAB CUTI]. Pihak sekolah diminta memberi pertimbangan yang sewajarnya terhadap permohonan ini.",
+                    paragraph2: "Sepanjang tempoh cuti tersebut, saya akan memastikan anak saya mengejar pelajaran yang tertinggal dan melengkapkan semua tugasan yang diberikan oleh guru-guru. Saya memahami pentingnya kehadiran ke sekolah dan berjanji ini tidak akan menjejaskan prestasi akademiknya. Saya juga akan menghubungi guru kelasnya untuk mendapatkan maklumat mengenai silibus pembelajaran dan tugasan yang perlu diselesaikan.",
+                    paragraph3: "Saya amat menghargai perhatian dan pertimbangan pihak tuan/puan dalam perkara ini. Kerjasama dan kefahaman daripada pihak sekolah amatlah dihargai. Sekiranya pihak tuan/puan memerlukan sebarang maklumat lanjut, sila hubungi saya di nombor telefon yang tertera di atas pada bila-bila masa yang bersesuaian."
+                },
+                tidakHadir: {
+                    subject: "SURAT TIDAK HADIR KE SEKOLAH",
+                    paragraph1: "Dengan segala hormatnya, saya merujuk kepada perkara di atas. Saya ingin memaklumkan bahawa anak saya, [NAMA PELAJAR], tidak dapat hadir ke sekolah pada [TARIKH] kerana [SEBAB TIDAK HADIR]. Ketidakhadiran ini adalah di luar kawalan kami dan kami memohon pengertian daripada pihak sekolah.",
+                    paragraph2: "Saya memahami bahawa kehadiran ke sekolah adalah penting untuk pembelajaran anak saya. Saya telah memastikan beliau mendapat rawatan yang sewajarnya dan akan kembali ke sekolah sebaik sahaja keadaannya pulih. Kami telah mengambil langkah-langkah yang perlu untuk memastikan anak saya tidak ketinggalan dalam pelajarannya semasa ketidakhadiran ini.",
+                    paragraph3: "Saya berharap pihak sekolah dapat memberikan kebenaran dan kerjasama dalam perkara ini. Saya juga akan memastikan anak saya mengejar pelajaran yang tertinggal semasa ketidakhadirannya. Jika pihak sekolah memerlukan sebarang dokumen sokongan atau maklumat tambahan, sila maklumkan kepada saya dan saya akan menyediakannya dengan segera."
+                },
+                rayuanKemasukan: {
+                    subject: "RAYUAN KEMASUKAN SEKOLAH",
+                    paragraph1: "Dengan segala hormatnya, saya merujuk kepada perkara di atas. Saya ingin membuat rayuan untuk permohonan kemasukan anak saya, [NAMA PELAJAR], ke sekolah tuan yang tidak berjaya sebelum ini. Saya memahami bahawa proses pemilihan adalah sangat kompetitif, namun saya berharap pihak tuan/puan dapat mempertimbangkan semula permohonan ini berdasarkan merit dan keadaan khas kami.",
+                    paragraph2: "Anak saya sangat berminat untuk belajar di sekolah tuan/puan kerana kecemerlangan akademik dan kokurikulum yang ditawarkan. Beliau juga tinggal berdekatan dengan sekolah, iaitu dalam lingkungan [JARAK] kilometer dari sekolah, yang memudahkan perjalanan sehariannya. Prestasi akademik anak saya adalah cemerlang dengan purata markah [MARKAH] dalam peperiksaan terkini dan beliau juga aktif dalam aktiviti kokurikulum seperti [AKTIVITI KOKURIKULUM].",
+                    paragraph3: "Saya amat berharap pihak tuan/puan dapat mempertimbangkan semula permohonan ini dan memberikan peluang kepada anak saya untuk mendapat pendidikan yang cemerlang di bawah bimbingan para pendidik yang berpengalaman di sekolah tuan/puan. Saya percaya bahawa anak saya akan menjadi aset kepada sekolah dan dapat menyumbang secara positif kepada persekitaran pembelajaran. Segala pertimbangan daripada pihak tuan/puan amatlah dihargai."
+                },
+                rayuanBiasiswa: {
+                    subject: "RAYUAN BIASISWA/PENANGGUHAN YURAN",
+                    paragraph1: "Dengan segala hormatnya, saya merujuk kepada perkara di atas. Saya ingin membuat rayuan untuk mendapatkan biasiswa/penangguhan yuran sekolah bagi anak saya, [NAMA PELAJAR], yang kini berada di [KELAS/TINGKATAN]. Rayuan ini dibuat setelah menimbangkan keadaan kewangan semasa keluarga kami yang tidak memungkinkan pembayaran penuh yuran pada masa ini.",
+                    paragraph2: "Saya ingin memaklumkan bahawa keluarga kami sedang menghadapi kesulitan kewangan disebabkan [SEBAB KESULITAN KEWANGAN]. Pendapatan bulanan keluarga kami ialah sebanyak RM[JUMLAH] yang perlu menampung perbelanjaan [BILANGAN AHLI KELUARGA] orang ahli keluarga termasuk perbelanjaan untuk pendidikan anak-anak. Kami telah berusaha untuk mengurangkan perbelanjaan sebaik mungkin, namun masih menghadapi kesukaran untuk menampung kos pendidikan secara penuh pada masa ini.",
+                    paragraph3: "Saya amat berharap pihak sekolah dapat mempertimbangkan rayuan ini dan memberikan bantuan yang diperlukan. Sebarang bantuan yang diberikan akan membantu meringankan beban kewangan keluarga kami dan membolehkan anak saya meneruskan pendidikan tanpa gangguan. Kami berjanji akan membuat pembayaran penuh sebaik sahaja keadaan kewangan kami pulih. Saya sedia menyediakan sebarang dokumen sokongan tambahan yang diperlukan untuk menyokong rayuan ini."
+                },
+                akuanPendapatan: {
+                    subject: "AKUAN PENDAPATAN IBUBAPA/PENJAGA",
+                    paragraph1: "Dengan segala hormatnya, saya merujuk kepada perkara di atas. Saya, [NAMA PENUH IBUBAPA/PENJAGA], No. Kad Pengenalan [NO. IC], dengan ini mengaku bahawa pendapatan bulanan saya adalah sebanyak RM[JUMLAH] sebagai seorang [PEKERJAAN]. Pendapatan ini merupakan sumber kewangan utama keluarga saya dan digunakan untuk menampung semua perbelanjaan isi rumah termasuk pendidikan anak-anak.",
+                    paragraph2: "Saya juga ingin memaklumkan bahawa saya mempunyai tanggungan seramai [BILANGAN TANGGUNGAN] orang termasuk isteri/suami dan [BILANGAN ANAK] orang anak. Anak saya, [NAMA PELAJAR], kini sedang belajar di [NAMA SEKOLAH] dalam Tingkatan/Tahun [TINGKATAN/TAHUN]. Selain itu, saya juga mempunyai komitmen bulanan lain seperti pinjaman perumahan, pinjaman kenderaan, dan lain-lain perbelanjaan asas yang memerlukan perhatian kewangan.",
+                    paragraph3: "Saya mengesahkan bahawa segala maklumat yang diberikan adalah benar dan saya bertanggungjawab sepenuhnya jika terdapat sebarang pernyataan yang tidak benar. Surat akuan ini dibuat bagi tujuan [TUJUAN AKUAN]. Sekiranya pihak tuan/puan memerlukan sebarang pengesahan atau dokumen tambahan, saya bersedia untuk mengemukakannya pada bila-bila masa yang diperlukan."
+                },
+                perubahanSubjek: {
+                    subject: "PERMOHONAN PERUBAHAN MATA PELAJARAN",
+                    paragraph1: "Dengan segala hormatnya, saya merujuk kepada perkara di atas. Saya ingin memohon untuk menukar mata pelajaran anak saya, [NAMA PELAJAR], dari [SUBJEK SEMASA] kepada [SUBJEK BAHARU]. Permohonan ini dibuat setelah perbincangan mendalam dengan anak saya mengenai minat, kebolehan dan matlamat akademiknya untuk masa hadapan.",
+                    paragraph2: "Permohonan ini dibuat berdasarkan [SEBAB PERUBAHAN], dan saya percaya pertukaran ini akan memberikan manfaat kepada perkembangan akademik anak saya. Beliau telah menunjukkan minat dan kebolehan yang mendalam dalam bidang [BIDANG BERKAITAN] dan bercita-cita untuk melanjutkan pengajian dalam bidang ini di peringkat yang lebih tinggi. Kami telah berbincang dengan guru mata pelajaran berkaitan dan guru kaunseling yang turut menyokong keputusan ini berdasarkan penilaian mereka terhadap kebolehan dan minat anak saya.",
+                    paragraph3: "Saya berharap pihak sekolah dapat mempertimbangkan dan meluluskan permohonan ini. Saya juga ingin mengucapkan terima kasih atas perhatian dan sokongan pihak sekolah dalam membantu anak saya mencapai kecemerlangan akademik. Kami memahami bahawa terdapat prosedur dan keperluan tertentu untuk pertukaran mata pelajaran, dan kami bersedia untuk memenuhi semua keperluan tersebut sekiranya permohonan ini diluluskan."
+                },
+                aduan: {
+                    subject: "ADUAN MASALAH DI SEKOLAH",
+                    paragraph1: "Dengan segala hormatnya, saya merujuk kepada perkara di atas. Saya ingin menyampaikan aduan berkenaan [JENIS MASALAH] yang dihadapi oleh anak saya, [NAMA PELAJAR], yang berada di [KELAS/TINGKATAN]. Saya menyampaikan aduan ini dengan harapan pihak sekolah dapat mengambil tindakan yang sewajarnya untuk menangani isu ini dan memastikan persekitaran pembelajaran yang selamat dan kondusif untuk semua pelajar.",
+                    paragraph2: "Situasi ini telah berlaku sejak [TEMPOH MASALAH] dan saya telah cuba untuk menyelesaikannya dengan [USAHA YANG TELAH DILAKUKAN]. Walau bagaimanapun, masalah ini masih berterusan dan telah menjejaskan [KESAN KEPADA PELAJAR] anak saya. Saya berasa bimbang kerana situasi ini boleh memberi kesan negatif jangka panjang terhadap kesihatan mental dan prestasi akademik anak saya jika tidak ditangani dengan segera dan efektif.",
+                    paragraph3: "Saya berharap pihak sekolah dapat mengambil tindakan yang sewajarnya untuk menyelesaikan masalah ini. Saya percaya dengan kerjasama antara pihak sekolah dan ibubapa, kita dapat mewujudkan persekitaran pembelajaran yang selamat dan kondusif untuk semua pelajar. Saya bersedia untuk bertemu dengan pihak pentadbiran sekolah untuk membincangkan perkara ini dengan lebih lanjut dan mencari penyelesaian yang terbaik. Saya menghargai perhatian pihak sekolah terhadap aduan ini dan berharap dapat mendengar maklum balas atau tindakan yang akan diambil dalam masa terdekat."
+                },
+                kebenaranProgram: {
+                    subject: "KEBENARAN MENGIKUTI PROGRAM SEKOLAH",
+                    paragraph1: "Dengan segala hormatnya, saya merujuk kepada perkara di atas. Saya, [NAMA IBUBAPA/PENJAGA], ibu/bapa/penjaga kepada [NAMA PELAJAR], pelajar Tingkatan/Tahun [TINGKATAN/TAHUN], dengan ini memberikan kebenaran kepada anak saya untuk menyertai program [NAMA PROGRAM] yang akan diadakan pada [TARIKH PROGRAM] di [LOKASI PROGRAM]. Saya telah membaca dan memahami sepenuhnya maklumat program yang telah diberikan oleh pihak sekolah.",
+                    paragraph2: "Saya telah dimaklumkan tentang butiran program tersebut dan bersetuju dengan segala aktiviti yang dirancang. Saya juga mengizinkan pihak sekolah untuk mengambil tindakan kecemasan yang perlu sekiranya berlaku sebarang kecemasan yang melibatkan anak saya semasa program tersebut. Saya mengesahkan bahawa anak saya berada dalam keadaan kesihatan yang baik dan tidak mempunyai sebarang masalah kesihatan yang boleh menghalang penyertaannya dalam program ini. [JIKA ADA KEADAAN KESIHATAN KHAS: Walau bagaimanapun, saya ingin memaklumkan bahawa anak saya mempunyai [KEADAAN KESIHATAN] yang memerlukan perhatian khas.]",
+                    paragraph3: "Saya percaya program ini akan memberikan pengalaman yang berharga dan manfaat kepada perkembangan anak saya. Saya juga berterima kasih kepada pihak sekolah atas usaha untuk menyediakan peluang pembelajaran di luar bilik darjah ini. Sekiranya pihak sekolah memerlukan maklumat tambahan atau mempunyai sebarang pertanyaan, sila hubungi saya di nombor telefon yang tertera. Saya juga mengambil kesempatan ini untuk mengucapkan terima kasih kepada semua guru dan pihak yang terlibat dalam menjayakan program ini."
+                },
+                kebenaranKenderaan: {
+                    subject: "KEBENARAN MENGGUNAKAN KENDERAAN SENDIRI KE SEKOLAH",
+                    paragraph1: "Dengan segala hormatnya, saya merujuk kepada perkara di atas. Saya, [NAMA IBUBAPA/PENJAGA], ingin memohon kebenaran untuk anak saya, [NAMA PELAJAR], pelajar Tingkatan/Tahun [TINGKATAN/TAHUN], menggunakan kenderaan sendiri iaitu [JENIS KENDERAAN] bernombor pendaftaran [NOMBOR PENDAFTARAN] untuk ke sekolah. Permohonan ini dibuat setelah pertimbangan teliti terhadap keperluan perjalanan anak saya dan keadaan pengangkutan semasa.",
+                    paragraph2: "Permohonan ini dibuat atas sebab [SEBAB PERMOHONAN]. Saya memahami bahawa penggunaan kenderaan persendirian ke sekolah adalah tanggungjawab kami sepenuhnya dan pihak sekolah tidak bertanggungjawab atas sebarang kemalangan yang mungkin berlaku dalam perjalanan ke atau dari sekolah. Saya telah berbincang secara menyeluruh dengan anak saya mengenai tanggungjawab dan keselamatan di jalan raya, serta memastikan beliau memahami dan akan mematuhi semua peraturan lalu lintas dan peraturan sekolah.",
+                    paragraph3: "Saya berjanji akan memastikan anak saya mematuhi semua peraturan lalu lintas dan peraturan sekolah berkaitan penggunaan kenderaan persendirian. Anak saya juga memiliki lesen memandu yang sah untuk mengendalikan kenderaan tersebut. Saya amat berharap pihak sekolah dapat mempertimbangkan dan meluluskan permohonan ini. Sekiranya pihak sekolah mempunyai sebarang syarat tambahan berkaitan penggunaan kenderaan persendirian ke sekolah, saya dan anak saya bersedia untuk mematuhinya sepenuhnya."
+                },
+                salinanSijil: {
+                    subject: "PERMOHONAN SALINAN SIJIL BERHENTI SEKOLAH",
+                    paragraph1: "Dengan segala hormatnya, saya merujuk kepada perkara di atas. Saya ingin memohon salinan sijil berhenti sekolah bagi [NAMA PELAJAR] yang telah menuntut di sekolah tuan/puan dari tahun [TAHUN MULA] hingga [TAHUN TAMAT]. Permohonan ini dibuat kerana sijil tersebut sangat diperlukan untuk tujuan yang dinyatakan di bawah dan saya tidak mempunyai salinan asal yang boleh digunakan.",
+                    paragraph2: "Sijil tersebut diperlukan untuk tujuan [TUJUAN PERMOHONAN]. Salinan sijil asal telah [SEBAB MEMERLUKAN SALINAN BARU] dan saya amat memerlukan salinan baharu untuk urusan tersebut. Saya memahami bahawa proses ini mungkin memerlukan masa dan mungkin tertakluk kepada prosedur pentadbiran tertentu, namun saya berharap permohonan ini dapat diproses secepat mungkin memandangkan kepentingannya untuk urusan yang dinyatakan.",
+                    paragraph3: "Saya amat menghargai sekiranya pihak tuan/puan dapat memproses permohonan ini dengan segera. Saya bersedia untuk membayar sebarang kos yang dikenakan untuk pengeluaran salinan sijil tersebut. Terima kasih atas perhatian dan kerjasama pihak tuan/puan dalam perkara ini. Sekiranya pihak sekolah memerlukan sebarang maklumat tambahan atau dokumen sokongan, saya bersedia untuk menyediakannya dengan segera demi memudahkan proses permohonan ini."
+                }
+            };
+            
+            return contents[letterType] || {
+                subject: "[TAJUK SURAT]",
+                paragraph1: "[Paragraf pertama surat anda]",
+                paragraph2: "[Paragraf kedua surat anda]",
+                paragraph3: "[Paragraf ketiga surat anda]"
+            };
+        }
+        
+        // Generate letter preview
+        function generatePreview() {
+            const letterType = document.getElementById('letterType').value;
+            
+            if (!letterType) {
+                alert('Sila pilih jenis surat terlebih dahulu');
+                return;
+            }
+            
+            const senderName = document.getElementById('senderName').value;
+            const senderAddress = document.getElementById('senderAddress').value;
+            const senderPhone = document.getElementById('senderPhone').value;
+            const letterDate = document.getElementById('letterDate').value;
+            const recipientName = document.getElementById('recipientName').value;
+            const recipientPosition = document.getElementById('recipientPosition').value;
+            const recipientInstitution = document.getElementById('recipientInstitution').value;
+            const recipientAddress = document.getElementById('recipientAddress').value;
+            
+            // Format sender info
+            let senderInfo = senderName + '<br>';
+            if (senderAddress) {
+                senderInfo += senderAddress.replace(/\n/g, '<br>') + '<br>';
+            }
+            if (senderPhone) {
+                senderInfo += 'Tel: ' + senderPhone;
+            }
+            
+            // Format recipient info
+            let recipientInfo = '';
+            if (recipientPosition) {
+                recipientInfo += recipientPosition + '<br>';
+            }
+            if (recipientName) {
+                recipientInfo += recipientName + '<br>';
+            }
+            if (recipientInstitution) {
+                recipientInfo += recipientInstitution + '<br>';
+            }
+            if (recipientAddress) {
+                recipientInfo += recipientAddress.replace(/\n/g, '<br>');
+            }
+            
+            // Get letter content
+            const letterContent = getLetterContent(letterType);
+            
+            // Replace placeholders with form data
+            let paragraph1 = letterContent.paragraph1;
+            let paragraph2 = letterContent.paragraph2;
+            let paragraph3 = letterContent.paragraph3;
+            
+            const studentName = document.getElementById('studentName').value;
+            const studentClass = document.getElementById('studentClass').value;
+            
+            if (studentName) {
+                paragraph1 = paragraph1.replace(/\[NAMA PELAJAR\]/g, studentName);
+                paragraph2 = paragraph2.replace(/\[NAMA PELAJAR\]/g, studentName);
+                paragraph3 = paragraph3.replace(/\[NAMA PELAJAR\]/g, studentName);
+            }
+            
+            if (studentClass) {
+                paragraph1 = paragraph1.replace(/\[KELAS\/TINGKATAN\]/g, studentClass);
+                paragraph2 = paragraph2.replace(/\[KELAS\/TINGKATAN\]/g, studentClass);
+                paragraph3 = paragraph3.replace(/\[KELAS\/TINGKATAN\]/g, studentClass);
+                paragraph1 = paragraph1.replace(/\[TINGKATAN\/TAHUN\]/g, studentClass);
+                paragraph2 = paragraph2.replace(/\[TINGKATAN\/TAHUN\]/g, studentClass);
+                paragraph3 = paragraph3.replace(/\[TINGKATAN\/TAHUN\]/g, studentClass);
+            }
+            
+            // Update letter preview
+            document.getElementById('senderInfoPreview').innerHTML = senderInfo;
+            document.getElementById('datePreview').innerHTML = formatDate(letterDate);
+            document.getElementById('recipientInfoPreview').innerHTML = recipientInfo;
+            document.getElementById('letterSubjectPreview').innerHTML = '<strong>PERKARA: ' + letterContent.subject + '</strong>';
+            document.getElementById('paragraph1').innerHTML = paragraph1;
+            document.getElementById('paragraph2').innerHTML = paragraph2;
+            document.getElementById('paragraph3').innerHTML = paragraph3;
+            document.getElementById('closingPreview').innerHTML = 'Yang benar,<br><br><br>';
+            document.getElementById('senderNamePreview').innerHTML = '(' + senderName + ')';
+            
+            // Add highlight animation to edit indicator
+            const editIndicator = document.querySelector('.edit-indicator');
+            editIndicator.classList.add('animate-pulse');
+            
+            // Remove animation after 3 seconds
+            setTimeout(() => {
+                editIndicator.classList.remove('animate-pulse');
+            }, 3000);
+            
+            // Enable PDF generation button
+            document.getElementById('generatePdfBtn').disabled = false;
+        }
+        
+        // Reset form
+        function resetForm() {
+            document.getElementById('letterType').value = '';
+            // Remove active class from all lettertype items
+            document.querySelectorAll('.lettertype-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            document.getElementById('senderName').value = '';
+            document.getElementById('senderAddress').value = '';
+            document.getElementById('senderPhone').value = '';
+            document.getElementById('letterDate').value = '';
+            document.getElementById('recipientName').value = '';
+            document.getElementById('recipientPosition').value = '';
+            document.getElementById('recipientInstitution').value = '';
+            document.getElementById('recipientAddress').value = '';
+            document.getElementById('studentName').value = '';
+            document.getElementById('studentClass').value = '';
+            
+            document.getElementById('senderInfoPreview').innerHTML = '';
+            document.getElementById('datePreview').innerHTML = '';
+            document.getElementById('recipientInfoPreview').innerHTML = '';
+            document.getElementById('letterSubjectPreview').innerHTML = '';
+            document.getElementById('paragraph1').innerHTML = '';
+            document.getElementById('paragraph2').innerHTML = '';
+            document.getElementById('paragraph3').innerHTML = '';
+            document.getElementById('closingPreview').innerHTML = '';
+            document.getElementById('senderNamePreview').innerHTML = '';
+            
+            document.getElementById('generatePdfBtn').disabled = true;
+        }
+        
+        // Generate PDF
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            
+            // Create a copy of the letter preview without the edit indicator
+            const letterPreviewOriginal = document.getElementById('letterPreview');
+            const letterPreview = letterPreviewOriginal.cloneNode(true);
+            
+            // Set PDF options
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+            
+            // Convert HTML to canvas
+            html2canvas(letterPreview, {
+                scale: 2,
+                useCORS: true,
+                logging: false
+            }).then(canvas => {
+                // Get canvas data as image
+                const imgData = canvas.toDataURL('image/png');
+                
+                // Set page margins
+                const pdfWidth = doc.internal.pageSize.getWidth();
+                const pdfHeight = doc.internal.pageSize.getHeight();
+                const margin = 15;
+                
+                // Calculate image dimensions for PDF
+                const imgWidth = pdfWidth - (margin * 2);
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                // Add image to PDF
+                doc.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
+                
+                // Add footer
+                doc.setFontSize(8);
+                doc.setTextColor(100, 100, 100);
+                doc.text('Mr.Syah @ 2025 Hak Cipta Terpelihara', pdfWidth / 2, pdfHeight - 10, {
+                    align: 'center'
+                });
+                
+                // Save PDF with appropriate filename
+                const letterType = document.getElementById('letterType').value;
+                const letterTypes = {
+                    cuti: 'Surat Permohonan Cuti Sekolah',
+                    tidakHadir: 'Surat Tidak Hadir ke Sekolah',
+                    rayuanKemasukan: 'Surat Rayuan Kemasukan Sekolah',
+                    rayuanBiasiswa: 'Surat Rayuan Biasiswa',
+                    akuanPendapatan: 'Surat Akuan Pendapatan',
+                    perubahanSubjek: 'Surat Permohonan Perubahan Mata Pelajaran',
+                    aduan: 'Surat Aduan Masalah di Sekolah',
+                    kebenaranProgram: 'Surat Kebenaran Program',
+                    kebenaranKenderaan: 'Surat Kebenaran Kenderaan',
+                    salinanSijil: 'Surat Permohonan Salinan Sijil'
+                };
+                
+                const fileName = letterTypes[letterType] || 'Surat Sekolah';
+                doc.save(fileName + '.pdf');
+            });
+        }
+        
+        // Set today's date as default
+        window.onload = function() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('letterDate').value = `${yyyy}-${mm}-${dd}`;
+        };
+    </script>
 </body>
 </html>
